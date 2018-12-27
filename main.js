@@ -7,6 +7,7 @@ const createHanlder = require('github-webhook-handler');
 const handler = createHanlder({ path: '/crawler_event_intercept', secret: 'ics#2018' });
 
 function LOGV(tag = 'NOTAG', obj = null) {
+    return;
     console.log('##########', tag);
     console.log(util.inspect(obj, { colors: true, depth: 10 }));
 }
@@ -31,7 +32,6 @@ handler.on('error', err => {
 
 handler.on('push', event => {
     LOGV('PUSH', event);
-/*
     console.log('[x] Received a push event for %s to %s',
         event.payload.repository.name,
         event.payload.ref);
@@ -39,7 +39,6 @@ handler.on('push', event => {
         console.log('---------------------------------');
         console.log(text);
     });
-*/
 });
 
 http.createServer((req, res) => {
