@@ -29,7 +29,7 @@ handler.on('error', err => {
     LOGV('ERROR', err);
 });
 
-handler.on('pull_reuest', event => {
+handler.on('pull_request', event => {
     LOGV('PUSH', event);
     console.log('[x] Received a pull_request event for %s to %s',
         event.payload.repository.name,
