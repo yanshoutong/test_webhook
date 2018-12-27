@@ -1,0 +1,22 @@
+{
+  "name": "test_webhook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanshoutong/test_webhook.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yanshoutong/test_webhook/issues"
+  },
+  "homepage": "https://github.com/yanshoutong/test_webhook#readme",
+  "dependencies": {
+    "github-webhook-handler": "^0.7.1"
+  }
+}
