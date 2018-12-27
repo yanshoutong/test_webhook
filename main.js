@@ -25,6 +25,10 @@ function runCommand(cmd, args, callback) {
     });
 }
 
+handler.on('error', err => {
+    LOGV('ERROR', err);
+});
+
 handler.on('push', event => {
     LOGV('PUSH', event);
 /*
@@ -44,6 +48,3 @@ http.createServer((req, res) => {
         res.end("no such location");
     });
 }).listen(6583);
-
-
-
