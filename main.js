@@ -8,7 +8,7 @@ const handler = createHanlder({ path: '/crawler_event_intercept', secret: 'ics#2
 
 function LOGV(tag = 'NOTAG', obj = null) {
     console.log('##########', tag);
-    console.log(util.inspect(obj, { colors: true }));
+    console.log(util.inspect(obj, { colors: true, depth: 10 }));
 }
 
 function runCommand(cmd, args, callback) {
