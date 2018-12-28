@@ -39,6 +39,7 @@ function parsePushEvent(push) {
         title: title,
         id: push.id,
         ref: push.payload.ref,
+
         created: push.payload.created,
         deleted: push.payload.deleted,
         forced: push.payload.forced,
@@ -47,6 +48,23 @@ function parsePushEvent(push) {
 }
 
 
+function parsePullRequestEvent(issue) {
+    let title = `PULL REQUEST for ${issue.payload.pull_request.head.repo.full_name} to ${issue.payload.pull_request.head.ref}`;
+    return {
+      event: issue.event,
+      title: title,
+      id: issue.id,
+      ref: issue.payload.pull_request.head.ref,
+      
+      number: issue.payload.number,
+      action: issue.payload.action,
+      merged: issue.payload.pull_request.merged,
+      user: issue.payload.pull_request.user.login,
+      description: issue.payload.pull_request.body
+    };
+}
+
 module.exports = {
     parsePushEvent,
+    parsePullRequestEvent,
 }
