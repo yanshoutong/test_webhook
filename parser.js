@@ -33,7 +33,7 @@
 */
 
 function parsePushEvent(push) {
-    let title = `PUSH for ${event.payload.repository.name} to ${event.payload.ref}`;
+    let title = `PUSH for ${push.payload.repository.name} to ${push.payload.ref}`;
     return {
         title: title,
         event: push.event,
