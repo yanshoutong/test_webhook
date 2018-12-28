@@ -50,13 +50,23 @@ handler.on('push', event => {
 
 handler.on('pull_request', event => {
     LOGV('PUSH', event);
-    console.log('[x] Received a PULL_REQUEST event for %s to %s',
-        event.payload.repository.name,
-        event.payload.ref);
-    runCommand('sh', ['./deploy.sh', 'pull_request'], text => {
-        console.log('---------------------------------'.yellow.bold);
-        console.log(text.yellow.bold);
-    });
+    let action = Parser.parsePullRequestEvent(event);
+    LOGV("PULL_REQUEST", action);
+
+    if ('opened' === action.action) {
+        runCommand('sh', ['./deploy.sh', 'pull_request'], text => {
+            console.log('---------------------------------'.yellow.bold);
+            console.log(text.yellow.bold);
+        });        
+    }
+    else if ('closed' == action.action) {
+        if (action.merged) {
+            console.log('PULL_REQUEST merged'.inverse.red);
+        } else {
+            console.log('PULL_REQUEST closed whith unmerged commits');
+        }
+    }
+
 });
 
 
