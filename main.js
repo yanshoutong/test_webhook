@@ -36,6 +36,12 @@ handler.on('push', event => {
     LOGV('PUSH', event);
     let action = Parser.parsePushEvent(event);
     LOGV('PUSH ACTION', action);
+
+    if (action.commits.length < 1) {
+        console.log(`DELETE: ${action.ref}`.red.bold);
+        return;
+    }
+    
     runCommand('sh', ['./deploy.sh', 'pull_request'], text => {
         console.log('---------------------------------'.green.bold);
         console.log(text.green.bold);

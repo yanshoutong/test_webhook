@@ -39,7 +39,7 @@ function parsePushEvent(push) {
         event: push.event,
         id: push.id,
         ref: push.payload.ref,
-        commits: push.payload.commits,
+        commits: push.payload.commits,  // this field can be empty array
     };
 }
 
