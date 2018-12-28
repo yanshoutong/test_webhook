@@ -33,7 +33,7 @@ handler.on('error', err => {
 });
 
 handler.on('push', event => {
-    LOGV('PUSH', event);
+    //LOGV('PUSH', event);
     let action = Parser.parsePushEvent(event);
     LOGV('PUSH ACTION', action);
 
@@ -49,7 +49,7 @@ handler.on('push', event => {
 });
 
 handler.on('pull_request', event => {
-    LOGV('PUSH', event);
+    //LOGV('PUSH', event);
     let action = Parser.parsePullRequestEvent(event);
     LOGV("PULL_REQUEST ACTION", action);
 
