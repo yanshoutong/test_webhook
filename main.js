@@ -37,7 +37,7 @@ handler.on('push', event => {
     let action = Parser.parsePushEvent(event);
     LOGV('PUSH ACTION', action);
 
-    if (action.commits.length < 1) {
+    if (action.deleted) {
         console.log(`DELETE: ${action.ref}`.red.bold);
         return;
     }

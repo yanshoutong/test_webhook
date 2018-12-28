@@ -35,11 +35,14 @@
 function parsePushEvent(push) {
     let title = `PUSH for ${push.payload.repository.name} to ${push.payload.ref}`;
     return {
-        title: title,
         event: push.event,
+        title: title,
         id: push.id,
         ref: push.payload.ref,
-        commits: push.payload.commits,  // this field can be empty array
+        created: push.payload.created,
+        deleted: push.payload.deleted,
+        forced: push.payload.forced,
+        commits: push.payload.commits,
     };
 }
 
