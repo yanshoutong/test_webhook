@@ -7,6 +7,8 @@ const spawn = require('child_process').spawn;
 const createHanlder = require('github-webhook-handler');
 const handler = createHanlder({ path: '/crawler_event_intercept', secret: 'ics#2018' });
 
+const Parser = require('./parser');
+
 function LOGV(tag = 'NOTAG', obj = null) {
     console.log('##########', tag);
     console.log(util.inspect(obj, { colors: true, depth: 10 }));
@@ -32,9 +34,8 @@ handler.on('error', err => {
 
 handler.on('push', event => {
     LOGV('PUSH', event);
-    console.log('[x] Received a PUSH event for %s to %s',
-        event.payload.repository.name,
-        event.payload.ref);
+    let action = Parser.parsePushEvent(event);
+    LOGV('PUSH ACTION', action);
     runCommand('sh', ['./deploy.sh', 'pull_request'], text => {
         console.log('---------------------------------'.green.bold);
         console.log(text.green.bold);
