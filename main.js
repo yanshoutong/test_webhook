@@ -42,7 +42,7 @@ handler.on('push', event => {
         return;
     }
     
-    runCommand('sh', ['./deploy.sh', 'pull_request'], text => {
+    runCommand('sh', ['./deploy.sh', 'PUSH', action.id], text => {
         console.log('---------------------------------'.green.bold);
         console.log(text.green.bold);
     });
