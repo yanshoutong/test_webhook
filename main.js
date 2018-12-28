@@ -8,10 +8,11 @@ const createHanlder = require('github-webhook-handler');
 const handler = createHanlder({ path: '/crawler_event_intercept', secret: 'ics#2018' });
 
 const Parser = require('./parser');
+const USE_COLOR = false;
 
 function LOGV(tag = 'NOTAG', obj = null) {
     console.log('##########', tag);
-    console.log(util.inspect(obj, { colors: true, depth: 10 }));
+    console.log(util.inspect(obj, { colors: USE_COLOR, depth: 10 }));
 }
 
 function runCommand(cmd, args, callback) {
@@ -33,7 +34,7 @@ handler.on('error', err => {
 });
 
 handler.on('push', event => {
-    //LOGV('PUSH', event);
+    LOGV('PUSH', event);
     let action = Parser.parsePushEvent(event);
     LOGV('PUSH ACTION', action);
 
@@ -49,7 +50,7 @@ handler.on('push', event => {
 });
 
 handler.on('pull_request', event => {
-    //LOGV('PUSH', event);
+    LOGV('PUSH', event);
     let action = Parser.parsePullRequestEvent(event);
     LOGV("PULL_REQUEST ACTION", action);
 
