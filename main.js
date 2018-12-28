@@ -51,9 +51,9 @@ handler.on('push', event => {
 handler.on('pull_request', event => {
     LOGV('PUSH', event);
     let action = Parser.parsePullRequestEvent(event);
-    LOGV("PULL_REQUEST", action);
+    LOGV("PULL_REQUEST ACTION", action);
 
-    if ('opened' === action.action) {
+    if ('opened' === action.action || 'synchronize' === action.action) {
         runCommand('sh', ['./deploy.sh', 'pull_request'], text => {
             console.log('---------------------------------'.yellow.bold);
             console.log(text.yellow.bold);
