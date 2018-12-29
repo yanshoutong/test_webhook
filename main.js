@@ -8,7 +8,11 @@ const createHanlder = require('github-webhook-handler');
 const handler = createHanlder({ path: '/crawler_event_intercept', secret: 'ics#2018' });
 
 const Parser = require('./parser');
+const Timeline = require('./timeline');
+
 const USE_COLOR = false;
+
+const timeline = new Timeline();
 
 function LOGV(tag = 'NOTAG', obj = null) {
     console.log('##########', tag);
@@ -38,12 +42,13 @@ handler.on('push', event => {
     let action = Parser.parsePushEvent(event);
     LOGV('PUSH ACTION', action);
 
-    if (action.deleted) {
+
+   if (action.deleted) {
         console.log(`DELETE: ${action.ref}`.red.bold);
         return;
     }
     
-    runCommand('sh', ['./deploy.sh', 'PUSH', action.id], text => {
+    runCommand('sh', ['./deploy.sh', 'push', action.id, action.ref], text => {
         console.log('---------------------------------'.green.bold);
         console.log(text.green.bold);
     });
@@ -55,7 +60,11 @@ handler.on('pull_request', event => {
     LOGV("PULL_REQUEST ACTION", action);
 
     if ('opened' === action.action || 'synchronize' === action.action) {
-        runCommand('sh', ['./deploy.sh', 'pull_request'], text => {
+        if ('opened' === action.action) {
+            timeline.addPullRequestAction(action);
+        }
+
+        runCommand('sh', ['./deploy.sh', 'pull_request', action.id, action.ref], text => {
             console.log('---------------------------------'.yellow.bold);
             console.log(text.yellow.bold);
         });        
