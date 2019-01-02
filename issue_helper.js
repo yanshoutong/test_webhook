@@ -47,7 +47,7 @@ async function create({ title = 'NO TITLE', body = 'NO BODY', labels = [] } = {}
     }
 
     if (res.statusCode !== 201) {
-        log.error('create{}', `received statusCode is ${res.statusCode} - body: ${data}`);
+        log.error('create{}', `received statusCode is ${res.statusCode} - body: ${JSON.stringify(data, null, 4)}`);
         return false;
     }
 
