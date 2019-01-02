@@ -21,6 +21,11 @@ async function requestSync(options) {
         };
     }
 
+    options.auth = {
+        user: 'yanshoutong@sina.cn',
+        pass: process.env['PASSWORD']
+    };
+
     return new Promise((resolve, reject) => {
         request(options, function(err, res, data) {
             resolve({err, res, data});
