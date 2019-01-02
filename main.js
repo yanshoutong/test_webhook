@@ -18,6 +18,12 @@ function LOGV(tag = 'NOTAG', obj = null) {
     log.info(util.inspect(obj, { colors: USE_COLOR, depth: 10 }));
 }
 
+function uniformRef(ref) {
+    if (ref.startsWith('refs/heads')) return ref.replace('refs/heads', 'origin');
+    else if (!ref.startsWith('origin')) return 'origin/' + ref;
+    return ref;
+}
+
 handler.on('error', err => {
     LOGV('ERROR', err);
 });
@@ -33,10 +39,8 @@ handler.on('push', async event => {
         return;
     }
     
-    runCommand('sh', ['./deploy.sh', 'push', action.id, action.ref], text => {
-        log.info('---------------------------------'.green.bold);
-        log.info(text.green.bold);
-    });
+    let { output, exitCode } = await Commando.runCommand('sh', ['./deploy.sh', 'push', action.id, uniformRef(action.ref)]);
+    LOGV('Commando push', { output, exitCode });
 });
 
 handler.on('pull_request', async event => {
@@ -48,8 +52,8 @@ handler.on('pull_request', async event => {
         if ('opened' === action.action) {
         }
 
-        let { output, exitCode } = await Commando.runCommand('sh', ['./deploy.sh', 'pull_request', action.id, 'origin/' + action.ref]);
-        LOGV('Commando', { output, exitCode });
+        let { output, exitCode } = await Commando.runCommand('sh', ['./deploy.sh', 'pull_request', action.id, uniformRef(action.ref)]);
+        LOGV('Commando pull_request', { output, exitCode });
     }
     else if ('closed' == action.action) {
         if (action.merged) {
