@@ -14,7 +14,7 @@ const Parser = require('./parser');
 const USE_COLOR = false;
 
 function LOGV(tag = 'NOTAG', obj = null) {
-    log.info('#####', tag '#####');
+    log.info('#####', tag, '#####');
     log.info(util.inspect(obj, { colors: USE_COLOR, depth: 10 }));
 }
 
@@ -22,7 +22,7 @@ handler.on('error', err => {
     LOGV('ERROR', err);
 });
 
-handler.on('push', event => {
+handler.on('push', async event => {
     LOGV('PUSH', event);
     let action = Parser.parsePushEvent(event);
     LOGV('PUSH ACTION', action);
@@ -39,7 +39,7 @@ handler.on('push', event => {
     });
 });
 
-handler.on('pull_request', event => {
+handler.on('pull_request', async event => {
     LOGV('PUSH', event);
     let action = Parser.parsePullRequestEvent(event);
     LOGV("PULL_REQUEST ACTION", action);
@@ -49,6 +49,7 @@ handler.on('pull_request', event => {
         }
 
         let { output, exitCode } = await Commando.runCommand('sh', ['./deploy.sh', 'pull_request', action.id, 'origin/' + action.ref]);
+        LOGV('Commando', { output, exitCode });
     }
     else if ('closed' == action.action) {
         if (action.merged) {
