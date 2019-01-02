@@ -102,11 +102,13 @@ async function mark({ number = null, labels = [] } = {}) {
     }
 
     let { err, res, data } = await requestSync({
-        url: `https://api.github.com/repos/yanshoutong/test_webhook/issues/${number}`,
+        url: `https://api.github.com/repos/yanshoutong/test_webhook/issues/${number}?access_token=24d4617a6552de32b3063027eb241604d8414bc9`,
         method: 'PATCH',
         body: {
+            body: 'ASASSS',
             labels: labels
-        }
+        },
+        json: true,
     });
 
     if (err) {
@@ -114,8 +116,8 @@ async function mark({ number = null, labels = [] } = {}) {
         return false;
     }
 
-    if (res.statusCode !== 200) {
-        log.error('mark{}', `received statusCode is ${res.statusCode} - body: ${data}`);
+    if (res.statusCode !== 204) {
+        log.error('mark{}', `received statusCode is ${res.statusCode} - body: ${JSON.stringify(data, null, 4)}}`);
         return false;
     }
 
