@@ -7,7 +7,7 @@ const util = require('util');
 const Commando = require('./commando');
 const log = require('./log');
 const createHanlder = require('github-webhook-handler');
-const handler = createHanlder({ path: '/crawler_event_intercept', secret: 'ics#2018' });
+const handler = createHanlder({ path: '/crawler_event_intercept', secret: '1234567890' });
 
 const Parser = require('./parser');
 
