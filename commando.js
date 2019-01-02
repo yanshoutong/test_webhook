@@ -30,6 +30,6 @@ function runCommand(cmd, args) {
     });
 }
 
-module.exports = runCommand;
+module.exports = { runCommand }
 
 
