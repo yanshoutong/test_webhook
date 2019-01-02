@@ -4,22 +4,25 @@ const util = require('util');
 const request = require('request').defaults({ timeout: 30 * 1000 });
 const log = require('./log');
 
-const GITHUB_TOKEN = " token deb3628ca5eb2082acf8d38cb37e9fb210d6fda9";
+const GITHUB_BASE_URL = 'https://api.github.com/repos/yanshoutong/test_webhook';
 const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36';
 
 
 // Make the request(options, callback) synchronous
 async function requestSync(options) {
     if (options.headers) {
-        options.headers['Authorization'] = GITHUB_TOKEN;
         options.headers['User-Agent'] = USER_AGENT;
     }
     else {
         options.headers = { 
-            'Authorization': GITHUB_TOKEN,
             'User-Agent': USER_AGENT,
         };
     }
+
+    options.auth = {
+        user: process.env['GITHUB_WEBHOOK_USERNAME'],
+        pass: process.env['GITHUB_WEBHOOK_PASSWORD']
+    };
 
     return new Promise((resolve, reject) => {
         request(options, function(err, res, data) {
@@ -31,7 +34,7 @@ async function requestSync(options) {
 
 async function create({ title = 'NO TITLE', body = 'NO BODY', labels = [] } = {}) {
     let { err, res, data } = await requestSync({
-        url: 'https://api.github.com/repos/yanshoutong/test_webhook/issues',
+        url: `${GITHUB_BASE_URL}/issues`,
         method: 'POST',
         body: {
             'title': title || 'no title',
@@ -47,7 +50,7 @@ async function create({ title = 'NO TITLE', body = 'NO BODY', labels = [] } = {}
     }
 
     if (res.statusCode !== 201) {
-        log.error('create{}', `received statusCode is ${res.statusCode} - body: ${data}`);
+        log.error('create{}', `received statusCode is ${res.statusCode} - body: ${JSON.stringify(data, null, 4)}`);
         return false;
     }
 
@@ -67,7 +70,7 @@ async function appendComment({ number = null, body = null } = {}) {
     }
 
     let { err, res, data } = await requestSync({
-        url: `https://api.github.com/repos/yanshoutong/test_webhook/issues/${number}/comments`,
+        url: `${GITHUB_BASE_URL}/issues/${number}/comments`,
         method: 'POST',
         body: {
             'body': body
@@ -81,7 +84,7 @@ async function appendComment({ number = null, body = null } = {}) {
     }
 
     if (res.statusCode !== 201) {
-        log.error('appendComment{}', `received statusCode is ${res.statusCode} - body: ${data}`);
+        log.error('appendComment{}', `received statusCode is ${res.statusCode} - body: ${JSON.stringify(data, null, 4)}`);
         return false;
     }
 
@@ -102,11 +105,12 @@ async function mark({ number = null, labels = [] } = {}) {
     }
 
     let { err, res, data } = await requestSync({
-        url: `https://api.github.com/repos/yanshoutong/test_webhook/issues/${number}`,
+        url: `${GITHUB_BASE_URL}/issues/${number}`,
         method: 'PATCH',
         body: {
             labels: labels
-        }
+        },
+        json: true,
     });
 
     if (err) {
@@ -114,8 +118,8 @@ async function mark({ number = null, labels = [] } = {}) {
         return false;
     }
 
-    if (res.statusCode !== 200) {
-        log.error('mark{}', `received statusCode is ${res.statusCode} - body: ${data}`);
+    if (res.statusCode !== 204) {
+        log.error('mark{}', `received statusCode is ${res.statusCode} - body: ${JSON.stringify(data, null, 4)}}`);
         return false;
     }
 

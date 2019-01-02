@@ -151,7 +151,7 @@ handler.on('error', err => {
 });
 
 handler.on('push', async event => {
-    LOGV('PUSH', event);
+    //LOGV('PUSH', event);
     let action = Parser.parsePushEvent(event);
     LOGV('PUSH ACTION', action);
 
@@ -165,7 +165,7 @@ handler.on('push', async event => {
 });
 
 handler.on('pull_request', async event => {
-    LOGV('PUSH', event);
+    //LOGV('PULL_REQUEST', event);
     let action = Parser.parsePullRequestEvent(event);
     LOGV("PULL_REQUEST ACTION", action);
 
