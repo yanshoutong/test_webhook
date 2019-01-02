@@ -1,36 +1,21 @@
 'use strict';
 
 const colors = require('colors');
+
 const http = require('http');
 const util = require('util');
-const spawn = require('child_process').spawn;
+const Commando = require('./commando');
+const log = require('./log');
 const createHanlder = require('github-webhook-handler');
 const handler = createHanlder({ path: '/crawler_event_intercept', secret: 'ics#2018' });
 
 const Parser = require('./parser');
-const Timeline = require('./timeline');
 
 const USE_COLOR = false;
 
-const timeline = new Timeline();
-
 function LOGV(tag = 'NOTAG', obj = null) {
-    console.log('##########', tag);
-    console.log(util.inspect(obj, { colors: USE_COLOR, depth: 10 }));
-}
-
-function runCommand(cmd, args, callback) {
-    let childProcess = spawn(cmd, args);
-    let resp = '';
-
-    childProcess.stdout.on('data', buffer => {
-        resp += buffer.toString();
-    });
-
-    childProcess.stdout.on('end', () => {
-        if (callback) callback(resp);
-        resp = '';
-    });
+    log.info('#####', tag '#####');
+    log.info(util.inspect(obj, { colors: USE_COLOR, depth: 10 }));
 }
 
 handler.on('error', err => {
@@ -44,13 +29,13 @@ handler.on('push', event => {
 
 
    if (action.deleted) {
-        console.log(`DELETE: ${action.ref}`.red.bold);
+        log.info(`DELETE: ${action.ref}`.red.bold);
         return;
     }
     
     runCommand('sh', ['./deploy.sh', 'push', action.id, action.ref], text => {
-        console.log('---------------------------------'.green.bold);
-        console.log(text.green.bold);
+        log.info('---------------------------------'.green.bold);
+        log.info(text.green.bold);
     });
 });
 
@@ -61,19 +46,15 @@ handler.on('pull_request', event => {
 
     if ('opened' === action.action || 'synchronize' === action.action) {
         if ('opened' === action.action) {
-            timeline.addPullRequestAction(action);
         }
 
-        runCommand('sh', ['./deploy.sh', 'pull_request', action.id, action.ref], text => {
-            console.log('---------------------------------'.yellow.bold);
-            console.log(text.yellow.bold);
-        });        
+        let { output, exitCode } = await Commando.runCommand('sh', ['./deploy.sh', 'pull_request', action.id, 'origin/' + action.ref]);
     }
     else if ('closed' == action.action) {
         if (action.merged) {
-            console.log('PULL_REQUEST merged'.inverse.red);
+            log.info('PULL_REQUEST merged'.inverse.red);
         } else {
-            console.log('PULL_REQUEST closed whith unmerged commits');
+            log.info('PULL_REQUEST closed whith unmerged commits'.inverse.blue);
         }
     }
 
