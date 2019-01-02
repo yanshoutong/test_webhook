@@ -4,26 +4,24 @@ const util = require('util');
 const request = require('request').defaults({ timeout: 30 * 1000 });
 const log = require('./log');
 
-const GITHUB_TOKEN = " token 794f6ffd99403aa3e64ddb92f0adbaf69731f1c6";
+const GITHUB_BASE_URL = 'https://api.github.com/repos/yanshoutong/test_webhook';
 const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36';
 
 
 // Make the request(options, callback) synchronous
 async function requestSync(options) {
     if (options.headers) {
-        options.headers['Authorization'] = GITHUB_TOKEN;
         options.headers['User-Agent'] = USER_AGENT;
     }
     else {
         options.headers = { 
-            'Authorization': GITHUB_TOKEN,
             'User-Agent': USER_AGENT,
         };
     }
 
     options.auth = {
-        user: 'yanshoutong@sina.cn',
-        pass: process.env['PASSWORD']
+        user: process.env['GITHUB_WEBHOOK_USERNAME'],
+        pass: process.env['GITHUB_WEBHOOK_PASSWORD']
     };
 
     return new Promise((resolve, reject) => {
@@ -36,7 +34,7 @@ async function requestSync(options) {
 
 async function create({ title = 'NO TITLE', body = 'NO BODY', labels = [] } = {}) {
     let { err, res, data } = await requestSync({
-        url: 'https://api.github.com/repos/yanshoutong/test_webhook/issues',
+        url: `${GITHUB_BASE_URL}/issues`,
         method: 'POST',
         body: {
             'title': title || 'no title',
@@ -72,7 +70,7 @@ async function appendComment({ number = null, body = null } = {}) {
     }
 
     let { err, res, data } = await requestSync({
-        url: `https://api.github.com/repos/yanshoutong/test_webhook/issues/${number}/comments`,
+        url: `${GITHUB_BASE_URL}/issues/${number}/comments`,
         method: 'POST',
         body: {
             'body': body
@@ -107,7 +105,7 @@ async function mark({ number = null, labels = [] } = {}) {
     }
 
     let { err, res, data } = await requestSync({
-        url: `https://api.github.com/repos/yanshoutong/test_webhook/issues/${number}`,
+        url: `${GITHUB_BASE_URL}/issues/${number}`,
         method: 'PATCH',
         body: {
             labels: labels
