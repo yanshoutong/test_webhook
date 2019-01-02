@@ -4,7 +4,7 @@ const util = require('util');
 const request = require('request').defaults({ timeout: 30 * 1000 });
 const log = require('./log');
 
-const GITHUB_TOKEN = " token 24d4617a6552de32b3063027eb241604d8414bc9";
+const GITHUB_TOKEN = " token ff7655f5829afd084c98c442522aeed6d4fe9c78";
 const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36';
 
 
@@ -102,10 +102,9 @@ async function mark({ number = null, labels = [] } = {}) {
     }
 
     let { err, res, data } = await requestSync({
-        url: `https://api.github.com/repos/yanshoutong/test_webhook/issues/${number}?access_token=24d4617a6552de32b3063027eb241604d8414bc9`,
+        url: `https://api.github.com/repos/yanshoutong/test_webhook/issues/${number}`,
         method: 'PATCH',
         body: {
-            body: 'ASASSS',
             labels: labels
         },
         json: true,
