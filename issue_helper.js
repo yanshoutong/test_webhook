@@ -90,8 +90,42 @@ async function appendComment({ number = null, body = null } = {}) {
 
 }
 
+async function mark({ number = null, labels = [] } = {}) {
+    if (!number || typeof number !== 'number') {
+        log.error('issue #number is invalid');
+        return false;
+    }
+
+    if (labels.length < 1) {
+        log.error('no labels to be marked');
+        return false;
+    }
+
+    let { err, res, data } = await requestSync({
+        url: `https://api.github.com/repos/yanshoutong/test_webhook/issues/${number}`,
+        method: 'PATCH',
+        body: {
+            labels: labels
+        }
+    });
+
+    if (err) {
+        log.error('mark{}', err);
+        return false;
+    }
+
+    if (res.statusCode !== 200) {
+        log.error('mark{}', `received statusCode is ${res.statusCode} - body: ${data}`);
+        return false;
+    }
+
+    log.info('mark{}', 'done!');
+    return true;
+}
+
 
 module.exports = {
     create: create,
-    appendComment: appendComment
+    appendComment: appendComment,
+    mark: mark,
 }
