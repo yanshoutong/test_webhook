@@ -4,7 +4,7 @@ const util = require('util');
 const request = require('request').defaults({ timeout: 30 * 1000 });
 const log = require('./log');
 
-const GITHUB_TOKEN = " token deb3628ca5eb2082acf8d38cb37e9fb210d6fda9";
+const GITHUB_TOKEN = " token 24d4617a6552de32b3063027eb241604d8414bc9";
 const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36';
 
 
