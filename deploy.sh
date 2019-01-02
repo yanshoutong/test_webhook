@@ -1,7 +1,15 @@
 #! /bin/sh
 
-echo "** deploy ** " $*
+echo "** deploy **  $*"
 
+#
+# Exit Code:
+# ----------
+#   0 : everything goes well
+#   1 : argument error
+#
+
+CODEBASE="https://github.com/yanshoutong/test_webhook.git"
 REPO=.repo
 
 if [ $# != 3 ]; then
@@ -17,8 +25,12 @@ if [ ! -d $REPO ]; then
 fi
 
 cd $REPO
+rm -rf *
+
 echo "start to clone $remote_branch"
-
-
-
-
+git clone $CODEBASE code
+cd code
+git checkout --track $remote_branch
+npm install
+node smoke
+exit $?
