@@ -59,6 +59,9 @@ async function handlePushAction(action) {
         return;
     }
 
+    body += '\n---  \n';
+    body += output;
+
     let mylabels = [];
     switch (exitCode) {
         case 1:
@@ -84,11 +87,8 @@ async function handlePushAction(action) {
         case 6:
             mylabels.push('BUILD_PASSED');
             mylabels.push('SMOKE_TEST_FAILED');
-
             mytitle += 'smoke test failed';
-            body += '\n---  \n';
-            body += output;
-            break;
+           break;
         default:
             mytitle += 'WEBHOOK ERROR - unknown cases';
             break;
