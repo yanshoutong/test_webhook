@@ -31,7 +31,9 @@ async function handlePushAction(action) {
     LOGV('Commando push', { output, exitCode });
 
     let body = '### PUSH  \n';
+    let mytitle = '';
     let author = null;
+
     for (let commit of action.commits) {
         let timestamp = moment(commit.timestamp).format('YYYY-MM-DD HH:mm:ss');
         body += `- ${commit.id} at ${timestamp}  \n`;
@@ -48,15 +50,18 @@ async function handlePushAction(action) {
     console.log('*****> ', author);
 
     if (!exitCode) {
+        if (author) {
+            mytitle = action.title + ' triggered by ' + author;
+        }
+
         await Issue.create({
-            title: action.title,
+            title: mytitle,
             body: body,
             labels: [ 'BUILD_PASSED', 'SMOKE_TEST_PASSED' ]
         });
         return;
     }
 
-    let mytitle = '';
     let mylabels = [];
     switch (exitCode) {
         case 1:
