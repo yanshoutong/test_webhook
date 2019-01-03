@@ -32,27 +32,28 @@ async function handlePushAction(action) {
 
     let body = '### PUSH  \n';
     let mytitle = '';
-    let author = null;
+    let authors = [];
 
     for (let commit of action.commits) {
         let timestamp = moment(commit.timestamp).format('YYYY-MM-DD HH:mm:ss');
         body += `- ${commit.id} at ${timestamp}  \n`;
         body += `> ${commit.message}  \n`; 
 
-        if (commit.author && !author) {
-            author = `${commit.author.name || commit.author.username}(${commit.author.email}) `;
+        if (commit.author) {
+            authors.push(commit.author.username);
         }
 
     }
 
     if (!exitCode) {
-        if (author) {
-            mytitle = action.title + ' triggered by ' + author;
+        if (authors.length) {
+            mytitle = action.title + ' triggered by ' + authors[0];
         }
 
         await Issue.create({
             title: mytitle,
             body: body,
+            assignees: authors,
             labels: [ 'BUILD_PASSED', 'SMOKE_TEST_PASSED' ]
         });
         return;
@@ -93,13 +94,14 @@ async function handlePushAction(action) {
             break;
     }
 
-    if (author) {
-        mytitle += ' triggered by ' + author;
+    if (authors.length) {
+        mytitle += ' triggered by ' + authors[0];
     }
 
     await Issue.create({
         title: mytitle,
         body: body,
+        assignees: authors,
         labels: mylabels
     });
 }
