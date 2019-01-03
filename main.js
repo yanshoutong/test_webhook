@@ -31,10 +31,15 @@ async function handlePushAction(action) {
     LOGV('Commando push', { output, exitCode });
 
     let body = '### PUSH  \n';
+    let author = null;
     for (let commit of action.commits) {
         let timestamp = moment(commit.timestamp).format('YYYY-MM-DD HH:mm:ss');
         body += `- ${commit.id} at ${timestamp}  \n`;
         body += `> ${commit.message}  \n`; 
+
+        if (commit.author && !author) {
+            author = `${commit.author.name || commit.author.username}(${commit.author.email}) `;
+        }
     }
 
     if (!exitCode) {
@@ -80,6 +85,10 @@ async function handlePushAction(action) {
         default:
             mytitle += 'WEBHOOK ERROR - unknown cases';
             break;
+    }
+
+    if (author) {
+        mytitle += ' triggered by ' + author;
     }
 
     await Issue.create({
