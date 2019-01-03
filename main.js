@@ -33,8 +33,8 @@ async function handlePushAction(action) {
     let body = '### PUSH  \n';
     for (let commit of action.commits) {
         let timestamp = moment(commit.timestamp).format('YYYY-MM-DD HH:mm:ss');
-        body += `- ${commit}.id at ${timestamp}  \n`;
-        body += `> ${commit}.message  \n`; 
+        body += `- ${commit.id} at ${timestamp}  \n`;
+        body += `> ${commit.message}  \n`; 
     }
 
     if (!exitCode) {
