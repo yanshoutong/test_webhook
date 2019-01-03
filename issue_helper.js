@@ -32,13 +32,14 @@ async function requestSync(options) {
 }
 
 
-async function create({ title = 'NO TITLE', body = 'NO BODY', labels = [] } = {}) {
+async function create({ title = 'NO TITLE', body = 'NO BODY', labels = [], assignees = [] } = {}) {
     let { err, res, data } = await requestSync({
         url: `${GITHUB_BASE_URL}/issues`,
         method: 'POST',
         body: {
             'title': title || 'no title',
             'body': body || 'no body',
+            assignees: assignees,
             'labels': labels,
         },
         json: true,
