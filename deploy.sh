@@ -56,7 +56,7 @@ fi
 # change working dir to code underneath $CODEBASE
 cd code
 # checkout $remote_branch
-git checkout --track $remote_branch
+git checkout -b $remote_branch devops 
 if [ $? -ne 0 ]; then
     echo "failed to checkout $remote_branch"
     exit 4
