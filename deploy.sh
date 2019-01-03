@@ -30,6 +30,7 @@ remote_branch=$3
 # make sure $REPO folder exists, create it if needed
 if [ ! -d $REPO ]; then
     echo "$REPO folder does not exist, create it"
+    echo mkdir $REPO
     mkdir $REPO
     if [ $? -ne 0 ]; then
         echo "failed to create $REPO folder"
@@ -39,13 +40,16 @@ fi
 
 #
 # change working dir to $REPO and do cleanup if needed
+echo cd $REPO
 cd $REPO
+echo rm -rf *
 rm -rf *
 
 
 #
 # git clone $remote_branch
 echo "start to clone $remote_branch"
+echo git clone $CODEBASE code
 git clone $CODEBASE code
 if [ $? -ne 0 ]; then
     echo "failed to clone $CODEBASE"
@@ -54,9 +58,11 @@ fi
 
 #
 # change working dir to code underneath $CODEBASE
+echo cd code
 cd code
 # checkout $remote_branch
-git checkout -b $remote_branch devops 
+echo git checkout -b devops $remote_branch 
+git checkout -b devops $remote_branch 
 if [ $? -ne 0 ]; then
     echo "failed to checkout $remote_branch"
     exit 4
@@ -65,6 +71,7 @@ fi
 #
 # npm install
 echo "start to npm install..."
+echo npm install
 npm install
 if [ $? -ne 0 ]; then
     echo "failed to do npm install"
@@ -74,6 +81,7 @@ fi
 #
 # do smoke testing
 echo "start to do smoke tests..."
+echo node smoke
 node smoke
 if [ $? -ne 0 ]; then
     echo "smoke test failed exit code is $?"
