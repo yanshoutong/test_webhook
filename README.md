@@ -1,2 +1,2 @@
 # test_webhook
-try to test github webhook functionality
+try to test github webhook functionalities
