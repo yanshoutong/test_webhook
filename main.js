@@ -60,7 +60,9 @@ async function handlePushAction(action) {
     }
 
     body += '\n---  \n';
+    body += "```sh\n";
     body += output;
+    body += "\n```";
 
     let mylabels = [];
     switch (exitCode) {
