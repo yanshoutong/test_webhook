@@ -37,10 +37,15 @@ async function handlePushAction(action) {
         body += `- ${commit.id} at ${timestamp}  \n`;
         body += `> ${commit.message}  \n`; 
 
+        LOGV('author', commit.author);
         if (commit.author && !author) {
             author = `${commit.author.name || commit.author.username}(${commit.author.email}) `;
+            console.log('====> ', author);
         }
+
     }
+
+    console.log('*****> ', author);
 
     if (!exitCode) {
         await Issue.create({
