@@ -50,6 +50,7 @@ async function handlePushAction(action) {
             mytitle = action.title + ' triggered by ' + authors[0];
         }
 
+        LOGV('authors array', authors);
         await Issue.create({
             title: mytitle,
             body: body,
@@ -97,6 +98,8 @@ async function handlePushAction(action) {
     if (authors.length) {
         mytitle += ' triggered by ' + authors[0];
     }
+
+    LOGV('authors array', authors);
 
     await Issue.create({
         title: mytitle,
