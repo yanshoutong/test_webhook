@@ -180,7 +180,7 @@ handler.on('push', async event => {
         return;
     }
 
-    if (Issue.shouldDeploy(action.ref)) {
+    if (await Issue.shouldDeploy(action.ref)) {
         console.log('-------------------------------- deploy with push ----------------------------------'.green.bold);
         console.log('-------------------------------- deploy with push ----------------------------------'.green.bold);
         console.log('-------------------------------- deploy with push ----------------------------------'.green.bold);
@@ -195,10 +195,10 @@ handler.on('pull_request', async event => {
     LOGV("PULL_REQUEST ACTION", action);
 
     if ('opened' === action.action) {
-        console.log('-------------------------------- deploy ----------------------------------'.yellow.bold);
-        console.log('-------------------------------- deploy ----------------------------------'.yellow.bold);
-        console.log('-------------------------------- deploy ----------------------------------'.yellow.bold);
-        console.log('-------------------------------- deploy ----------------------------------'.yellow.bold);
+        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
+        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
+        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
+        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
  
         await handlePullRequestAction(action);
     }
