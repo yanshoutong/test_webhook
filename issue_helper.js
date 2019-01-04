@@ -172,8 +172,8 @@ async function shouldDeploy(ref) {
     }
 
     return data.some(e => {
-        console.log(`${ref} <-> ${e.head.ref} = ${e.head.ref.includes(ref)}`.blue.bold);
-        return e.head.ref.includes(ref);
+        console.log(`${ref} <-> ${e.head.ref} = ${ref.includes(e.head.ref)}`.blue.bold);
+        return ref.includes(e.head.ref);
     });
 }
 
