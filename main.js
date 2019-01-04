@@ -189,6 +189,14 @@ handler.on('pull_request', async event => {
     LOGV("PULL_REQUEST ACTION", action);
 
     if ('opened' === action.action || 'synchronize' === action.action) {
+        if ('synchronize' === action.action) {
+            console.log(`synchronize for ${action.ref}`.bold.green);
+            console.log(`synchronize for ${action.ref}`.bold.green);
+            console.log(`synchronize for ${action.ref}`.bold.green);
+            console.log(`synchronize for ${action.ref}`.bold.green);
+            console.log(`synchronize for ${action.ref}`.bold.green);
+        }
+
         await handlePullRequestAction(action);
     }
     else if ('closed' == action.action) {

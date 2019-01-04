@@ -128,9 +128,42 @@ async function mark({ number = null, labels = [] } = {}) {
     return true;
 }
 
+async function isPullRequestBranch(ref) {
+    if (!ref) {
+        log.error('isPullRequestBranch{} ref is null');
+        return false;
+    }
+
+    let { err, res, data } = await requestSync({
+        url: `${GITHUB_BASE_URL}/pulls`,
+        method: 'GET',
+        body: {
+            state: 'open',
+        },
+        json: true,
+    });
+
+    if (err) {
+        log.error('isPullRequestBranch{}', err);
+        return false;
+    }
+
+    if (res.statusCode !== 200) {
+        log.error('isPullRequestBranch{}', `received statusCode is ${res.statusCode} - body: ${JSON.stringify(data, null, 4)}}`);
+        return false;
+    }
+
+    if (!Array.isArray(data)) {
+        log.error('isPullRequestBranch{}', 'data is not an array');
+        return false;
+    }
+
+    return data.some(e => e.head.ref.includes(ref));
+}
 
 module.exports = {
     create: create,
     appendComment: appendComment,
     mark: mark,
+    isPullRequestBranch: isPullRequestBranch,
 }
