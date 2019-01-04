@@ -1,5 +1,6 @@
 'use strict';
 
+const colors = require('colors');
 const util = require('util');
 const request = require('request').defaults({ timeout: 30 * 1000 });
 const log = require('./log');
@@ -170,7 +171,10 @@ async function shouldDeploy(ref) {
         return false;
     }
 
-    return data.some(e => e.head.ref.includes(ref));
+    return data.some(e => {
+        console.log(`${ref} <-> ${e.head.ref} = ${e.head.ref.includes(ref)}`.blue.bold);
+        return e.head.ref.includes(ref);
+    });
 }
 
 module.exports = {
