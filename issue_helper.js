@@ -128,12 +128,24 @@ async function mark({ number = null, labels = [] } = {}) {
     return true;
 }
 
-async function isPullRequestBranch(ref) {
+async function shouldDeploy(ref) {
     if (!ref) {
         log.error('isPullRequestBranch{} ref is null');
         return false;
     }
 
+    if ([
+            'refs/heads/master', 
+            'refs/heads/release_admin',
+            'refs/heads/release_crawler',
+            'refs/heads/release_frontend',
+            'refs/heads/release_monitor'
+        ].includes(ref)) {
+        log.info(`${ref} receives PUSH event`);
+        return true;
+    }
+
+    
     let { err, res, data } = await requestSync({
         url: `${GITHUB_BASE_URL}/pulls`,
         method: 'GET',
@@ -165,5 +177,5 @@ module.exports = {
     create: create,
     appendComment: appendComment,
     mark: mark,
-    isPullRequestBranch: isPullRequestBranch,
+    shouldDeploy: shouldDeploy,
 }
