@@ -175,12 +175,18 @@ handler.on('push', async event => {
     LOGV('PUSH ACTION', action);
 
 
-   if (action.deleted) {
+    if (action.deleted) {
         log.info(`DELETE: ${action.ref}`.red.bold);
         return;
     }
-    
-    await handlePushAction(action);
+
+    if (await Issue.shouldDeploy(action.ref)) {
+        console.log('-------------------------------- deploy with push ----------------------------------'.green.bold);
+        console.log('-------------------------------- deploy with push ----------------------------------'.green.bold);
+        console.log('-------------------------------- deploy with push ----------------------------------'.green.bold);
+        console.log('-------------------------------- deploy with push ----------------------------------'.green.bold);
+        await handlePushAction(action);
+    }
 });
 
 handler.on('pull_request', async event => {
@@ -188,16 +194,16 @@ handler.on('pull_request', async event => {
     let action = Parser.parsePullRequestEvent(event);
     LOGV("PULL_REQUEST ACTION", action);
 
-    if ('opened' === action.action || 'synchronize' === action.action) {
-        if ('synchronize' === action.action) {
-            console.log(`synchronize for ${action.ref}`.bold.green);
-            console.log(`synchronize for ${action.ref}`.bold.green);
-            console.log(`synchronize for ${action.ref}`.bold.green);
-            console.log(`synchronize for ${action.ref}`.bold.green);
-            console.log(`synchronize for ${action.ref}`.bold.green);
-        }
-
+    if ('opened' === action.action) {
+        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
+        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
+        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
+        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
+ 
         await handlePullRequestAction(action);
+    }
+    else if ('synchronize' === action.action) {
+        log.info(`${action.ref} is synchronized now`);
     }
     else if ('closed' == action.action) {
         if (action.merged) {
