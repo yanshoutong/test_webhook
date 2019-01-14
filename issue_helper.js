@@ -74,16 +74,16 @@ async function create({ title = 'NO TITLE', body = 'NO BODY', labels = [], assig
 
     if (err) {
         log.error('create{}', err);
-        return false;
+        return { err, res, data };
     }
 
     if (res.statusCode !== 201) {
         log.error('create{}', `received statusCode is ${res.statusCode} - body: ${JSON.stringify(data, null, 4)}`);
-        return false;
+        return { err, res, data };
     }
 
     log.info('create{}', 'done!');
-    return true;
+    return { err, res, data };
 }
 
 async function appendComment({ number = null, body = null } = {}) {
