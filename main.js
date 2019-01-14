@@ -258,6 +258,8 @@ handler.on('pull_request', async event => {
 });
 
 
+console.log('start to create a http server to listen for #6538 port...'.green);
+
 http.createServer((req, res) => {
     handler(req, res, err => {
         res.statusCode = 404;
