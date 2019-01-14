@@ -130,9 +130,9 @@ async function handlePushAction(action) {
     if (res && res.statusCode === 201 && prNum >= 0) {
         let issueN = data.number;
 
-        let comments = `Your PR(#${prNum}) resulted in `;
+        let comments = `Your PR(#${prNum}) resulted in`;
         for (let l of mylabels) {
-            comments += `** ${l} ** `
+            comments += `  *${l}*  `;
         }
         comments += `, and we have raised one issue(#${issueN}), you can `;
         comments += `navigate to **Issue** tab and check it out for more details.`;
@@ -202,7 +202,7 @@ async function handlePullRequestAction(action) {
 
         let comments = `Your PR(#${action.number}) resulted in `;
         for (let l of mylabels) {
-            comments += `** ${l} ** `
+            comments += `  *${l}*  `;
         }
         comments += `, and we have raised one issue(#${issueN}), you can `;
         comments += `navigate to **Issue** tab and check it out for more details.`;
@@ -257,6 +257,8 @@ handler.on('pull_request', async event => {
 
 });
 
+
+console.log('start to create a http server to listen for #6538 port...'.green);
 
 http.createServer((req, res) => {
     handler(req, res, err => {
