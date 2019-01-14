@@ -132,7 +132,7 @@ async function handlePushAction(action) {
 
         let comments = `Your PR(#${prNum}) resulted in`;
         for (let l of mylabels) {
-            comments += `  *${l}*  `
+            comments += `  *${l}*  `;
         }
         comments += `, and we have raised one issue(#${issueN}), you can `;
         comments += `navigate to **Issue** tab and check it out for more details.`;
@@ -202,7 +202,7 @@ async function handlePullRequestAction(action) {
 
         let comments = `Your PR(#${action.number}) resulted in `;
         for (let l of mylabels) {
-            comments += `  *${l}*  `
+            comments += `  *${l}*  `;
         }
         comments += `, and we have raised one issue(#${issueN}), you can `;
         comments += `navigate to **Issue** tab and check it out for more details.`;
