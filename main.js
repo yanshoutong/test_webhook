@@ -4,9 +4,10 @@ const colors = require('colors');
 
 const http = require('http');
 const util = require('util');
+const PQ = require('p-queue');
 const moment = require('moment');
 const createHanlder = require('github-webhook-handler');
-const handler = createHanlder({ path: '/crawler_event_intercept', secret: '1234567890' });
+const handler = createHanlder({ path: '/crawler_event_intercept', secret: '1q2w3e4r5t' });
 
 const log = require('./log');
 const Parser = require('./parser');
@@ -14,6 +15,11 @@ const Commando = require('./commando');
 const Issue = require('./issue_helper');
 
 const USE_COLOR = false;
+
+// here we run only one command at the time, otherwise, we cannot bring crawler
+// server up because of the port number occupation error.
+const Queue = new PQ({ concurrency: 1 });
+
 
 function LOGV(tag = 'NOTAG', obj = null) {
     log.info('#####', tag, '#####');
@@ -45,10 +51,23 @@ async function handlePushAction(action) {
 
     }
 
+    let prNum = await Issue.getPullNumber(action.ref);
     if (!exitCode) {
         if (authors.length) {
             mytitle = action.title + ' triggered by ' + authors[0];
         }
+
+        if (!Issue.isPresetBranch(action.ref)) {
+            if (prNum >= 0) {
+                await Issue.mark({
+                    number: prNum,
+                    labels: [ 'BUILD_PASSED', 'SMOKE_TEST_PASSED' ]
+                });
+
+                return;
+            }
+
+        } 
 
         await Issue.create({
             title: mytitle,
@@ -56,6 +75,7 @@ async function handlePushAction(action) {
             assignees: authors,
             labels: [ 'BUILD_PASSED', 'SMOKE_TEST_PASSED' ]
         });
+
         return;
     }
 
@@ -100,12 +120,26 @@ async function handlePushAction(action) {
         mytitle += ' triggered by ' + authors[0];
     }
 
-    await Issue.create({
+    let { err, res, data } = await Issue.create({
         title: mytitle,
         body: body,
         assignees: authors,
         labels: mylabels
     });
+
+    if (res && res.statusCode === 201 && prNum >= 0) {
+        let issueN = data.number;
+
+        let comments = `Your PR(#${prNum}) resulted in `;
+        for (let l of mylabels) {
+            comments += `** ${l} ** `
+        }
+        comments += `, and we have raised one issue(#${issueN}), you can `;
+        comments += `navigate to **Issue** tab and check it out for more details.`;
+
+        await Issue.appendComment({ number: prNum, body: comments });
+    }
+
 }
 
 async function handlePullRequestAction(action) {
@@ -157,11 +191,24 @@ async function handlePullRequestAction(action) {
             break;
     }
 
-    await Issue.create({
+    let { err, res, data } = await Issue.create({
         title: mytitle,
         body: body,
         labels: mylabels
     });
+
+    if (res && res.statusCode === 201) {
+        let issueN = data.number;
+
+        let comments = `Your PR(#${action.number}) resulted in `;
+        for (let l of mylabels) {
+            comments += `** ${l} ** `
+        }
+        comments += `, and we have raised one issue(#${issueN}), you can `;
+        comments += `navigate to **Issue** tab and check it out for more details.`;
+
+        await Issue.appendComment({ number: action.number, body: comments });
+    }
 
 }
 
@@ -181,11 +228,9 @@ handler.on('push', async event => {
     }
 
     if (await Issue.shouldDeploy(action.ref)) {
-        console.log('-------------------------------- deploy with push ----------------------------------'.green.bold);
-        console.log('-------------------------------- deploy with push ----------------------------------'.green.bold);
-        console.log('-------------------------------- deploy with push ----------------------------------'.green.bold);
-        console.log('-------------------------------- deploy with push ----------------------------------'.green.bold);
-        await handlePushAction(action);
+        Queue.add(async () => await handlePushAction(action)).then(() => {
+            log.info('deployment done - push event');
+        });
     }
 });
 
@@ -195,12 +240,9 @@ handler.on('pull_request', async event => {
     LOGV("PULL_REQUEST ACTION", action);
 
     if ('opened' === action.action) {
-        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
-        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
-        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
-        console.log('-------------------------------- deploy PR ----------------------------------'.yellow.bold);
- 
-        await handlePullRequestAction(action);
+        Queue.add(async () => await handlePullRequestAction(action)).then(() => {
+            log.info('deployment done - PR event');
+        });
     }
     else if ('synchronize' === action.action) {
         log.info(`${action.ref} is synchronized now`);

@@ -33,6 +33,32 @@ async function requestSync(options) {
 }
 
 
+async function _resetLabels(number) {
+    let { err, res, data } = await requestSync({
+        url: `${GITHUB_BASE_URL}/issues/${number}/labels`,
+        method: 'PUT',
+        body: {
+            labels: []
+        },
+        json: true
+
+    });
+
+    if (err) {
+        log.error('_resetLabels{}', err);
+        return false;
+    }
+
+    if (res.statusCode !== 200) {
+        log.error('_resetLabels{}', `received statusCode is ${res.statusCode} - body: ${JSON.stringify(data, null, 4)}`);
+        return false;
+    }
+
+    log.info('_resetLabels{}', 'done!');
+    return true;
+
+}
+
 async function create({ title = 'NO TITLE', body = 'NO BODY', labels = [], assignees = [] } = {}) {
     let { err, res, data } = await requestSync({
         url: `${GITHUB_BASE_URL}/issues`,
@@ -106,6 +132,8 @@ async function mark({ number = null, labels = [] } = {}) {
         return false;
     }
 
+    await _resetLabels(number);
+
     let { err, res, data } = await requestSync({
         url: `${GITHUB_BASE_URL}/issues/${number}`,
         method: 'PATCH',
@@ -129,24 +157,24 @@ async function mark({ number = null, labels = [] } = {}) {
     return true;
 }
 
-async function shouldDeploy(ref) {
-    if (!ref) {
-        log.error('isPullRequestBranch{} ref is null');
-        return false;
-    }
-
+function isPresetBranch(ref) {
     if ([
-            'refs/heads/master', 
-            'refs/heads/release_admin',
-            'refs/heads/release_crawler',
-            'refs/heads/release_frontend',
-            'refs/heads/release_monitor'
-        ].includes(ref)) {
-        log.info(`${ref} receives PUSH event`);
+        'refs/heads/master', 
+        'refs/heads/release_admin',
+        'refs/heads/release_crawler',
+        'refs/heads/release_frontend',
+        'refs/heads/release_monitor'
+    ].includes(ref)) {
+        log.info(`${ref} is preset branch`);
         return true;
     }
 
-    
+    log.info(`${ref} is not preset branch`);
+    return false;
+}
+
+
+async function getPulls() {
     let { err, res, data } = await requestSync({
         url: `${GITHUB_BASE_URL}/pulls`,
         method: 'GET',
@@ -157,29 +185,63 @@ async function shouldDeploy(ref) {
     });
 
     if (err) {
-        log.error('isPullRequestBranch{}', err);
-        return false;
+        log.error('getPulls{}', err);
+        return [];
     }
 
     if (res.statusCode !== 200) {
-        log.error('isPullRequestBranch{}', `received statusCode is ${res.statusCode} - body: ${JSON.stringify(data, null, 4)}}`);
-        return false;
+        log.error('getPulls{}', `received statusCode is ${res.statusCode} - body: ${JSON.stringify(data, null, 4)}}`);
+        return [];
     }
 
     if (!Array.isArray(data)) {
-        log.error('isPullRequestBranch{}', 'data is not an array');
+        log.error('getPulls{}', 'data is not an array');
+        return [];
+    }
+
+    return [...data];
+}
+
+async function shouldDeploy(ref) {
+    if (!ref) {
+        log.error('shouldDeploy{} ref is null');
         return false;
     }
 
+    if (isPresetBranch(ref)) return true;
+    let data = await getPulls();
+    
     return data.some(e => {
         console.log(`${ref} <-> ${e.head.ref} = ${ref.includes(e.head.ref)}`.blue.bold);
         return ref.includes(e.head.ref);
     });
 }
 
+async function getPullNumber(ref) {
+    if (!ref) {
+        log.error('getPullNumber{} ref is null');
+        return -1;
+    }
+
+    if (isPresetBranch(ref)) {
+        log.warn(`getPullNumber{} ${ref} is preset`);
+        return -1;
+    }
+
+    let data = await getPulls();
+    for (let pr of data) {
+        if (ref.includes(pr.head.ref)) return pr.number;
+    }
+
+    return -1;
+}
+
 module.exports = {
     create: create,
     appendComment: appendComment,
     mark: mark,
+    getPulls: getPulls,
+    getPullNumber: getPullNumber,
     shouldDeploy: shouldDeploy,
+    isPresetBranch: isPresetBranch,
 }

@@ -4,11 +4,14 @@ const spawn = require('child_process').spawn;
 const log = require('./log');
 
 function runCommand(cmd, args) {
+    log.info(`run command - ${cmd} ${args.join(' ')}`);
     return new Promise(resolve => {
+        log.info('start to run command...');
         let child = spawn(cmd, args);
         let resp = '';
 
         child.stdout.on('data', buf => {
+            log.info(buf.toString());
             resp += buf.toString();
         });
 
@@ -31,5 +34,3 @@ function runCommand(cmd, args) {
 }
 
 module.exports = { runCommand }
-
-
