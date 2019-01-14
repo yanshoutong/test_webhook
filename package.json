@@ -8,18 +8,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yanshoutong/test_webhook.git"
+    "url": "git+https://github.com/e12009/webhook.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/yanshoutong/test_webhook/issues"
+    "url": "https://github.com/e12009/webhook/issues"
   },
-  "homepage": "https://github.com/yanshoutong/test_webhook#readme",
+  "homepage": "https://github.com/e12009/webhook#README",
   "dependencies": {
     "colors": "^1.3.3",
     "github-webhook-handler": "^0.7.1",
     "moment": "^2.23.0",
+    "p-queue": "^3.0.0",
     "request": "^2.88.0"
   }
 }

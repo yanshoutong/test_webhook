@@ -1,6 +1,7 @@
 #! /bin/sh
 
-echo "** deploy **  $*"
+echo "** deploy **"  
+echo "==> $*"
 
 #
 # Exit Code:
@@ -14,7 +15,6 @@ echo "** deploy **  $*"
 #   6 : smoke test failed
 #
 
-CODEBASE="https://github.com/yanshoutong/test_webhook.git"
 REPO=.repo
 
 #
@@ -24,13 +24,12 @@ if [ $# != 3 ]; then
     exit 1
 fi
 
-remote_branch=$3
 
 #
 # make sure $REPO folder exists, create it if needed
 if [ ! -d $REPO ]; then
     echo "$REPO folder does not exist, create it"
-    echo mkdir $REPO
+    echo '$' mkdir $REPO
     mkdir $REPO
     if [ $? -ne 0 ]; then
         echo "failed to create $REPO folder"
@@ -38,53 +37,18 @@ if [ ! -d $REPO ]; then
     fi
 fi
 
-#
 # change working dir to $REPO and do cleanup if needed
-echo cd $REPO
+echo '$' cd $REPO
 cd $REPO
-echo rm -rf *
+echo '$' rm -rf *
 rm -rf *
 
-
-#
-# git clone $remote_branch
-echo "start to clone $remote_branch"
-echo git clone $CODEBASE code
-git clone $CODEBASE code
-if [ $? -ne 0 ]; then
-    echo "failed to clone $CODEBASE"
-    exit 3
-fi
-
-#
-# change working dir to code underneath $CODEBASE
-echo cd code
-cd code
-# checkout $remote_branch
-echo git checkout -b devops $remote_branch 
-git checkout -b devops $remote_branch 
-if [ $? -ne 0 ]; then
-    echo "failed to checkout $remote_branch"
-    exit 4
-fi
-
-#
-# npm install
-echo "start to npm install..."
-echo npm install
-npm install
-if [ $? -ne 0 ]; then
-    echo "failed to do npm install"
-    exit 5
-fi
-
-#
-# do smoke testing
-echo "start to do smoke tests..."
-echo node smoke
-node smoke
-if [ $? -ne 0 ]; then
-    echo "smoke test failed exit code is $?"
+(cd ..; ls -l smoke.js)
+echo '$' node ../smoke.js
+node ../smoke.js
+smokeExitCode=$?
+if [ $smokeExitCode -ne 0 ]; then
+    echo "smoke test failed exit code is $smokeExitCode"
     exit 6
 fi
 
